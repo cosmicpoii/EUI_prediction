@@ -1,0 +1,1456 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Apartment EUI Predictor</title>
+  <style>
+    :root {
+      --bg: #f7f4e5;
+      --panel: #ffffff;
+      --text: #1f2523;
+      --muted: #68736f;
+      --line: #dccfb5;
+      --accent: #2bbaa5;
+      --accent-dark: #238f80;
+      --mint: #93d3ae;
+      --vanilla: #faecb6;
+      --orange: #f9a822;
+      --giants: #f96635;
+      --warn: #9a5b16;
+      --bad: #a33a32;
+      --good: #238f61;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      background: #d8d2c8;
+      color: var(--text);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      font-size: 15px;
+      line-height: 1.45;
+    }
+
+    header {
+      border-bottom: 1px solid var(--line);
+      background: transparent;
+    }
+
+    .topbar {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 28px 32px 8px;
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: 0;
+      color: #132220;
+    }
+
+    .status {
+      color: #173a36;
+      font-size: 13px;
+      white-space: nowrap;
+    }
+
+    main {
+      max-width: 1480px;
+      margin: 0 auto;
+      padding: 24px 32px 36px;
+      display: grid;
+      grid-template-columns: minmax(360px, 430px) minmax(760px, 1fr);
+      gap: 24px;
+    }
+
+    section {
+      min-width: 0;
+    }
+
+    .panel {
+      background: #fffdf7;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: 0 1px 0 rgba(31, 37, 35, 0.04);
+    }
+
+    .panel-header {
+      padding: 16px 18px;
+      border-bottom: 1px solid var(--line);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    h2 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 700;
+      letter-spacing: 0;
+    }
+
+    .panel-body {
+      padding: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 12px;
+      font-weight: 650;
+      color: #334047;
+      margin-bottom: 6px;
+    }
+
+    input,
+    textarea {
+      width: 100%;
+      border: 1px solid #c8d1d6;
+      border-radius: 6px;
+      padding: 8px 10px;
+      font: inherit;
+      color: var(--text);
+      background: #fbfcfc;
+    }
+
+    input {
+      height: 40px;
+    }
+
+    input[type="range"] {
+      height: 28px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      accent-color: var(--accent);
+    }
+
+    input[type="number"] {
+      text-align: right;
+    }
+
+    .slider-grid {
+      display: grid;
+      gap: 12px;
+    }
+
+    .param-control {
+      display: grid;
+      grid-template-columns: minmax(118px, 0.8fr) minmax(140px, 1fr) minmax(92px, 0.55fr);
+      gap: 10px;
+      align-items: center;
+    }
+
+    .param-control label {
+      margin-bottom: 0;
+    }
+
+    .range-wrap {
+      min-width: 0;
+    }
+
+    .range-limits {
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-size: 10px;
+      line-height: 1;
+      margin-top: -2px;
+    }
+
+    textarea {
+      min-height: 96px;
+      resize: vertical;
+    }
+
+    .prompt-examples {
+      display: grid;
+      gap: 8px;
+      margin-top: 12px;
+    }
+
+    .example-title {
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 750;
+    }
+
+    .example-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 8px;
+    }
+
+    .example-prompt {
+      height: auto;
+      min-height: 38px;
+      padding: 8px 10px;
+      border-color: #c8d1d6;
+      background: #fffaf0;
+      color: #263138;
+      font-size: 12px;
+      line-height: 1.25;
+      text-align: left;
+    }
+
+    .example-prompt:hover {
+      background: #edf2f3;
+    }
+
+    input:focus,
+    textarea:focus {
+      outline: 2px solid rgba(28, 118, 110, 0.18);
+      border-color: var(--accent);
+      background: #fff;
+    }
+
+    .actions {
+      display: flex;
+      gap: 10px;
+      margin-top: 18px;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: 1px solid transparent;
+      border-radius: 6px;
+      height: 40px;
+      padding: 0 14px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+      background: var(--accent);
+      color: #10211f;
+    }
+
+    button:hover {
+      background: var(--accent-dark);
+    }
+
+    button.secondary {
+      background: #fffaf0;
+      color: var(--text);
+      border-color: #c8d1d6;
+    }
+
+    button.secondary:hover {
+      background: #edf2f3;
+    }
+
+    button:disabled {
+      cursor: wait;
+      opacity: 0.7;
+    }
+
+    .result {
+      display: grid;
+      grid-template-columns: minmax(180px, 220px) minmax(180px, 220px) minmax(340px, 1fr);
+      gap: 14px;
+      align-items: stretch;
+    }
+
+    .kpi {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 16px;
+      background: #fffaf0;
+    }
+
+    .kpi-value {
+      font-size: 38px;
+      line-height: 1;
+      font-weight: 800;
+      letter-spacing: 0;
+      margin-top: 8px;
+    }
+
+    .kpi-unit {
+      color: var(--muted);
+      font-size: 13px;
+      margin-top: 8px;
+    }
+
+    .metrics {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(96px, 1fr));
+      gap: 8px;
+    }
+
+    .metric {
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      padding: 10px;
+      background: #fbfcfc;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .metric-name {
+      color: var(--muted);
+      font-size: 10px;
+      font-weight: 650;
+      white-space: normal;
+      line-height: 1.15;
+    }
+
+    .metric-value {
+      font-size: clamp(13px, 1.1vw, 17px);
+      font-weight: 800;
+      margin-top: 4px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .message {
+      margin-top: 14px;
+      padding: 10px 12px;
+      border-radius: 6px;
+      border: 1px solid var(--line);
+      background: #fffaf0;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .message.warn {
+      border-color: #e0b46d;
+      background: #fff7e8;
+      color: var(--warn);
+    }
+
+    .message.bad {
+      border-color: #dfa09a;
+      background: #fff0ef;
+      color: var(--bad);
+    }
+
+    .agent-box {
+      margin-bottom: 18px;
+    }
+
+    .manual-box {
+      padding-top: 18px;
+      border-top: 1px solid var(--line);
+    }
+
+    .mode-note {
+      margin: 6px 0 14px;
+      color: var(--muted);
+      font-size: 13px;
+    }
+
+    .agent-response {
+      white-space: pre-wrap;
+      color: #263138;
+      line-height: 1.5;
+    }
+
+    .design-summary {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 14px;
+    }
+
+    .design-item {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      background: #fffaf0;
+      min-width: 0;
+    }
+
+    .design-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .design-item strong {
+      display: block;
+      margin-top: 2px;
+      font-size: 16px;
+    }
+
+    .building-view {
+      width: 100%;
+      height: 520px;
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      background: #fffaf0;
+      display: block;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 13px;
+    }
+
+    th,
+    td {
+      text-align: right;
+      padding: 9px 8px;
+      border-bottom: 1px solid var(--line);
+      white-space: nowrap;
+    }
+
+    th:first-child,
+    td:first-child {
+      text-align: left;
+    }
+
+    th {
+      color: var(--muted);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      font-weight: 800;
+    }
+
+    .improve {
+      color: var(--good);
+      font-weight: 800;
+    }
+
+    .table-wrap {
+      overflow-x: auto;
+    }
+
+    .info-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 12px;
+    }
+
+    .info-list {
+      margin: 0;
+      padding: 0;
+      list-style: none;
+      display: grid;
+      gap: 8px;
+      color: #3b4542;
+      font-size: 13px;
+    }
+
+    .info-list strong {
+      color: #1f2523;
+    }
+
+    .fixed-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .fixed-option {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      min-width: 0;
+      margin-bottom: 0;
+      padding: 8px 9px;
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      background: #fffaf0;
+      color: #334047;
+      font-size: 12px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .fixed-option input {
+      width: 14px;
+      height: 14px;
+      margin: 0;
+      accent-color: var(--accent);
+    }
+
+    .mini-button {
+      height: 30px;
+      padding: 0 10px;
+      font-size: 12px;
+    }
+
+    .mini-button.reject {
+      background: #fffaf0;
+      border-color: #c8d1d6;
+      color: var(--text);
+    }
+
+    tr.rejected {
+      opacity: 0.45;
+    }
+
+    .comparison-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 10px;
+    }
+
+    .comparison-item {
+      border: 1px solid var(--line);
+      border-radius: 6px;
+      padding: 10px;
+      background: #fffaf0;
+      min-width: 0;
+    }
+
+    .comparison-item span {
+      display: block;
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 750;
+    }
+
+    .comparison-item strong {
+      display: block;
+      margin-top: 3px;
+      font-size: 15px;
+    }
+
+    @media (max-width: 1120px) {
+      main {
+        grid-template-columns: 1fr;
+      }
+
+      .result {
+        grid-template-columns: 1fr;
+      }
+
+      .metrics {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 560px) {
+      .topbar {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      main {
+        padding: 14px;
+      }
+
+      .slider-grid,
+      .design-summary,
+      .metrics,
+      .info-grid,
+      .fixed-grid,
+      .comparison-grid,
+      .example-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .param-control {
+        grid-template-columns: 1fr;
+        gap: 6px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="topbar">
+      <h1>Apartment EUI Predictor</h1>
+      <div class="status" id="status">Checking model...</div>
+    </div>
+  </header>
+
+  <main>
+    <section class="panel">
+      <div class="panel-header">
+        <h2>Design Workflow</h2>
+      </div>
+      <div class="panel-body">
+        <div class="agent-box">
+          <h2>AI Design Agent</h2>
+          <p class="mode-note">Describe the apartment strategy in natural language. The agent will infer model inputs, run the EUI model, and explain the result.</p>
+          <label for="agent-description">Natural-language design request</label>
+          <textarea id="agent-description">A Seattle multifamily apartment with large windows and low air leakage.</textarea>
+          <div class="prompt-examples">
+            <div class="example-title">Example prompts</div>
+            <div class="example-grid">
+              <button type="button" class="example-prompt" data-prompt="A high-performance envelope: wall R around 45, roof R around 65, low-U windows near 0.20, WWR about 0.25, low infiltration, and south-facing orientation.">High-performance envelope</button>
+              <button type="button" class="example-prompt" data-prompt="A large-window design with WWR around 0.45, moderate wall and roof insulation, low-SHGC glazing, efficient lighting, and average air leakage.">Large-window option</button>
+              <button type="button" class="example-prompt" data-prompt="A cost-conscious baseline design with wall R about 31, roof R about 49, WWR around 0.30, standard window performance, standard lighting, and average infiltration.">Baseline-like design</button>
+              <button type="button" class="example-prompt" data-prompt="A daylighting-focused apartment with reduced lighting density, medium WWR around 0.35, high-performance windows, low air leakage, and east-facing orientation.">Daylighting focus</button>
+              <button type="button" class="example-prompt" data-prompt="An existing leaky condition with infiltration near the high end, average insulation, standard windows, medium WWR, and typical lighting density.">Leaky existing case</button>
+              <button type="button" class="example-prompt" data-prompt="A retrofit option that keeps WWR similar but improves window U-factor, reduces infiltration, lowers lighting density, and increases roof insulation.">Retrofit option</button>
+            </div>
+          </div>
+          <div class="actions">
+            <button type="button" id="agent-button">Run AI Agent</button>
+          </div>
+          <div class="design-summary" id="design-summary"></div>
+        </div>
+
+        <div class="manual-box">
+          <h2>Manual Parameter Test</h2>
+          <p class="mode-note">Use this when you already know the design parameters and want a direct model prediction.</p>
+        <form id="design-form">
+          <div class="slider-grid">
+            <div class="param-control" data-param="wall_r">
+              <label for="wall_r">Wall R-value</label>
+              <div class="range-wrap">
+                <input id="wall_r_range" type="range" min="9.0117" max="56.9917" step="0.01" value="31">
+                <div class="range-limits"><span>9.01</span><span>56.99</span></div>
+              </div>
+              <input id="wall_r" name="wall_r" type="number" min="9.0117" max="56.9917" step="any" value="31">
+            </div>
+            <div class="param-control" data-param="roof_r">
+              <label for="roof_r">Roof R-value</label>
+              <div class="range-wrap">
+                <input id="roof_r_range" type="range" min="17.0299" max="73.9716" step="0.01" value="49">
+                <div class="range-limits"><span>17.03</span><span>73.97</span></div>
+              </div>
+              <input id="roof_r" name="roof_r" type="number" min="17.0299" max="73.9716" step="any" value="49">
+            </div>
+            <div class="param-control" data-param="window_u">
+              <label for="window_u">Window U-factor</label>
+              <div class="range-wrap">
+                <input id="window_u_range" type="range" min="0.1254" max="0.5696" step="0.001" value="0.35">
+                <div class="range-limits"><span>0.125</span><span>0.570</span></div>
+              </div>
+              <input id="window_u" name="window_u" type="number" min="0.1254" max="0.5696" step="any" value="0.35">
+            </div>
+            <div class="param-control" data-param="wwr">
+              <label for="wwr">Window-to-wall ratio</label>
+              <div class="range-wrap">
+                <input id="wwr_range" type="range" min="0.1" max="0.4997" step="0.001" value="0.3">
+                <div class="range-limits"><span>0.10</span><span>0.50</span></div>
+              </div>
+              <input id="wwr" name="wwr" type="number" min="0.1" max="0.4997" step="any" value="0.3">
+            </div>
+            <div class="param-control" data-param="shgc">
+              <label for="shgc">SHGC</label>
+              <div class="range-wrap">
+                <input id="shgc_range" type="range" min="0.2004" max="0.6998" step="0.001" value="0.4">
+                <div class="range-limits"><span>0.20</span><span>0.70</span></div>
+              </div>
+              <input id="shgc" name="shgc" type="number" min="0.2004" max="0.6998" step="any" value="0.4">
+            </div>
+            <div class="param-control" data-param="lighting_density">
+              <label for="lighting_density">Lighting density</label>
+              <div class="range-wrap">
+                <input id="lighting_density_range" type="range" min="0.4633" max="7.6596" step="0.01" value="4">
+                <div class="range-limits"><span>0.46</span><span>7.66</span></div>
+              </div>
+              <input id="lighting_density" name="lighting_density" type="number" min="0.4633" max="7.6596" step="any" value="4">
+            </div>
+            <div class="param-control" data-param="infiltration">
+              <label for="infiltration">Infiltration</label>
+              <div class="range-wrap">
+                <input id="infiltration_range" type="range" min="0.00025" max="0.00075" step="0.000001" value="0.00045">
+                <div class="range-limits"><span>0.00025</span><span>0.00075</span></div>
+              </div>
+              <input id="infiltration" name="infiltration" type="number" min="0.00025" max="0.00075" step="any" value="0.00045">
+            </div>
+            <div class="param-control" data-param="orientation_deg">
+              <label for="orientation_deg">Orientation</label>
+              <div class="range-wrap">
+                <input id="orientation_deg_range" type="range" min="0" max="360" step="1" value="180">
+                <div class="range-limits"><span>0°</span><span>360°</span></div>
+              </div>
+              <input id="orientation_deg" name="orientation_deg" type="number" min="0" max="360" step="1" value="180">
+            </div>
+          </div>
+          <div class="actions">
+            <button type="submit" id="predict-button">Predict EUI</button>
+            <button type="button" class="secondary" id="suggest-button">Find Lower EUI</button>
+          </div>
+          <div class="fixed-grid" aria-label="Fixed parameters for lower EUI search">
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="wall_r">Wall R</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="roof_r">Roof R</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="window_u">Win U</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="wwr">WWR</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="shgc">SHGC</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="lighting_density">Light</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="infiltration">Infil.</label>
+            <label class="fixed-option"><input type="checkbox" name="fixed_parameter" value="orientation_deg">Orient.</label>
+          </div>
+        </form>
+        </div>
+        <div class="message" id="input-message">Ready.</div>
+      </div>
+    </section>
+
+    <section>
+      <div class="panel">
+        <div class="panel-header">
+          <h2>Prediction</h2>
+        </div>
+        <div class="panel-body">
+          <div class="result">
+            <div class="kpi">
+              <div class="metric-name">Predicted EUI</div>
+              <div class="kpi-value" id="eui-value">--</div>
+              <div class="kpi-unit">kBtu/sf/yr</div>
+            </div>
+            <div class="kpi">
+              <div class="metric-name">pEUI Reduction</div>
+              <div class="kpi-value" id="peui-value">--</div>
+              <div class="kpi-unit">vs. baseline design</div>
+              <div class="kpi-unit" id="baseline-value">Baseline EUI --</div>
+            </div>
+            <div>
+              <div class="metrics">
+                <div class="metric">
+                  <div class="metric-name">MAE</div>
+                  <div class="metric-value" id="mae-value">--</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-name">MSE</div>
+                  <div class="metric-value" id="mse-value">--</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-name">RMSE</div>
+                  <div class="metric-value" id="rmse-value">--</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-name">MAPE</div>
+                  <div class="metric-value" id="mape-value">--</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-name">Max Error</div>
+                  <div class="metric-value" id="max-error-value">--</div>
+                </div>
+                <div class="metric">
+                  <div class="metric-name">R2</div>
+                  <div class="metric-value" id="r2-value">--</div>
+                </div>
+              </div>
+              <div class="message" id="warning-message">No prediction yet.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <div class="panel-header">
+          <h2>Prototype Massing</h2>
+        </div>
+        <div class="panel-body">
+          <canvas class="building-view" id="building-canvas" width="760" height="280"></canvas>
+          <div class="message">Dimensioned prototype view. Massing uses ridge 36.54 m, span 19.84 m, eave 7.92 m, and ridge height 12.05 m.</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <div class="panel-header">
+          <h2>Prototype Info</h2>
+        </div>
+        <div class="panel-body">
+          <div class="info-grid">
+            <ul class="info-list">
+              <li><strong>Building type:</strong> 3-story Seattle multifamily apartment prototype.</li>
+              <li><strong>Units:</strong> 18 conditioned living units, 6 per floor.</li>
+              <li><strong>Areas:</strong> total 2,899.58 m2; conditioned 2,007.63 m2; attic 724.90 m2.</li>
+              <li><strong>Roof:</strong> ridge 36.54 m, span 19.84 m, eave 7.92 m, ridge 12.05 m, pitch about 5:12.</li>
+            </ul>
+            <ul class="info-list">
+              <li><strong>WWR:</strong> higher value draws larger windows on all facades.</li>
+              <li><strong>Window U / SHGC:</strong> U-factor changes frame emphasis; SHGC changes glazing warmth.</li>
+              <li><strong>Wall R / Roof R:</strong> higher values make envelope and roof surfaces more saturated.</li>
+              <li><strong>Lighting / Infiltration / Orientation:</strong> lighting changes interior glow, infiltration changes air-leak arrows, orientation rotates the compass indicator.</li>
+            </ul>
+          </div>
+          <div class="message">pEUI reduction is calculated against the baseline design inputs shown in the API response. Find Lower EUI samples nearby candidates, predicts each candidate with the surrogate model, and returns the lowest predicted EUI options.</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <div class="panel-header">
+          <h2>Suggestions</h2>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Decision</th>
+                  <th>Option</th>
+                  <th>EUI</th>
+                  <th>pEUI vs Current</th>
+                  <th>Improve</th>
+                  <th>Wall R</th>
+                  <th>Roof R</th>
+                  <th>Win U</th>
+                  <th>WWR</th>
+                  <th>SHGC</th>
+                  <th>Light</th>
+                  <th>Infil.</th>
+                  <th>Orient.</th>
+                </tr>
+              </thead>
+              <tbody id="suggestions-body">
+                <tr><td colspan="13" style="text-align:left;color:var(--muted);">No suggestions yet.</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <div class="panel-header">
+          <h2>Accepted Comparison</h2>
+        </div>
+        <div class="panel-body">
+          <div class="comparison-grid" id="comparison-grid">
+            <div class="comparison-item"><span>Status</span><strong>No accepted option yet.</strong></div>
+          </div>
+          <div class="message" id="comparison-message">Accept a suggestion to compare the previous design with the accepted design.</div>
+        </div>
+      </div>
+
+      <div class="panel" style="margin-top: 20px;">
+        <div class="panel-header">
+          <h2>Agent Response</h2>
+        </div>
+        <div class="panel-body">
+          <div class="message agent-response" id="agent-response">No agent response yet.</div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const statusEl = document.getElementById("status");
+    const form = document.getElementById("design-form");
+    const predictButton = document.getElementById("predict-button");
+    const suggestButton = document.getElementById("suggest-button");
+    const agentButton = document.getElementById("agent-button");
+    const agentDescription = document.getElementById("agent-description");
+    const examplePromptButtons = Array.from(document.querySelectorAll(".example-prompt"));
+    const agentResponse = document.getElementById("agent-response");
+    const designSummary = document.getElementById("design-summary");
+    const buildingCanvas = document.getElementById("building-canvas");
+    const inputMessage = document.getElementById("input-message");
+    const warningMessage = document.getElementById("warning-message");
+    const suggestionsBody = document.getElementById("suggestions-body");
+    const comparisonGrid = document.getElementById("comparison-grid");
+    const comparisonMessage = document.getElementById("comparison-message");
+    const fixedParameterInputs = Array.from(document.querySelectorAll('input[name="fixed_parameter"]'));
+    let lastSuggestions = [];
+    let suggestionBaseDesign = null;
+    let suggestionBaseEui = null;
+    const parameterBounds = {
+      wall_r: { min: 9.0117, max: 56.9917, digits: 2 },
+      roof_r: { min: 17.0299, max: 73.9716, digits: 2 },
+      window_u: { min: 0.1254, max: 0.5696, digits: 3 },
+      wwr: { min: 0.10, max: 0.4997, digits: 3 },
+      shgc: { min: 0.2004, max: 0.6998, digits: 3 },
+      lighting_density: { min: 0.4633, max: 7.6596, digits: 2 },
+      infiltration: { min: 0.00025, max: 0.00075, digits: 6 },
+      orientation_deg: { min: 0, max: 360, digits: 0 }
+    };
+
+    function readDesign() {
+      const data = new FormData(form);
+      return {
+        wall_r: Number(data.get("wall_r")),
+        roof_r: Number(data.get("roof_r")),
+        window_u: Number(data.get("window_u")),
+        wwr: Number(data.get("wwr")),
+        shgc: Number(data.get("shgc")),
+        lighting_density: Number(data.get("lighting_density")),
+        infiltration: Number(data.get("infiltration")),
+        orientation_deg: Number(data.get("orientation_deg"))
+      };
+    }
+
+    function setBusy(isBusy) {
+      predictButton.disabled = isBusy;
+      suggestButton.disabled = isBusy;
+      agentButton.disabled = isBusy;
+    }
+
+    function format(value, digits = 3) {
+      if (value === null || value === undefined || Number.isNaN(value)) return "--";
+      return Number(value).toFixed(digits);
+    }
+
+    function setMessage(el, text, kind = "") {
+      el.className = `message ${kind}`.trim();
+      el.textContent = text;
+    }
+
+    function clampParam(name, value) {
+      const bounds = parameterBounds[name];
+      const numeric = Number(value);
+      if (!bounds || Number.isNaN(numeric)) return value;
+      return Math.min(Math.max(numeric, bounds.min), bounds.max);
+    }
+
+    function setParamValue(name, value) {
+      const bounds = parameterBounds[name];
+      const clamped = clampParam(name, value);
+      const displayValue = bounds ? Number(clamped).toFixed(bounds.digits) : clamped;
+      const numberInput = document.getElementById(name);
+      const rangeInput = document.getElementById(`${name}_range`);
+      if (numberInput) numberInput.value = displayValue;
+      if (rangeInput) rangeInput.value = clamped;
+    }
+
+    function syncAllControls() {
+      Object.keys(parameterBounds).forEach((name) => {
+        setParamValue(name, document.getElementById(name).value);
+      });
+    }
+
+    function readFixedParameters() {
+      return fixedParameterInputs
+        .filter((input) => input.checked)
+        .map((input) => input.value);
+    }
+
+    function suggestionToDesign(item) {
+      return {
+        wall_r: item.wall_r,
+        roof_r: item.roof_r,
+        window_u: item.window_u,
+        wwr: item.wwr,
+        shgc: item.shgc,
+        lighting_density: item.lighting_density,
+        infiltration: item.infiltration,
+        orientation_deg: item.orientation_deg
+      };
+    }
+
+    function renderComparison(previousDesign, previousEui, acceptedDesign, acceptedEui) {
+      const rows = [
+        ["Predicted EUI", `${format(previousEui, 2)} -> ${format(acceptedEui, 2)} kBtu/sf/yr`],
+        ["Delta EUI", `${format(acceptedEui - previousEui, 2)} kBtu/sf/yr`],
+        ["Wall R", `${format(previousDesign.wall_r, 2)} -> ${format(acceptedDesign.wall_r, 2)}`],
+        ["Roof R", `${format(previousDesign.roof_r, 2)} -> ${format(acceptedDesign.roof_r, 2)}`],
+        ["Window U", `${format(previousDesign.window_u, 3)} -> ${format(acceptedDesign.window_u, 3)}`],
+        ["WWR", `${format(previousDesign.wwr, 3)} -> ${format(acceptedDesign.wwr, 3)}`],
+        ["SHGC", `${format(previousDesign.shgc, 3)} -> ${format(acceptedDesign.shgc, 3)}`],
+        ["Lighting", `${format(previousDesign.lighting_density, 2)} -> ${format(acceptedDesign.lighting_density, 2)} W/m2`],
+        ["Infiltration", `${format(previousDesign.infiltration, 6)} -> ${format(acceptedDesign.infiltration, 6)}`],
+        ["Orientation", `${format(previousDesign.orientation_deg, 0)}° -> ${format(acceptedDesign.orientation_deg, 0)}°`]
+      ];
+      comparisonGrid.innerHTML = rows.map(([label, value]) => `
+        <div class="comparison-item"><span>${label}</span><strong>${value}</strong></div>
+      `).join("");
+      const improvement = previousEui - acceptedEui;
+      setMessage(
+        comparisonMessage,
+        `Accepted design is ${format(improvement, 2)} kBtu/sf/yr lower than the previous design.`
+      );
+    }
+
+    function updatePredictionDisplay(result) {
+      document.getElementById("eui-value").textContent = format(result.predicted_eui_kbtu_sf_yr, 2);
+      document.getElementById("peui-value").textContent = result.p_eui_reduction === null || result.p_eui_reduction === undefined
+        ? "--"
+        : `${format(result.p_eui_reduction * 100, 1)}%`;
+      document.getElementById("baseline-value").textContent = `Baseline EUI ${format(result.baseline_eui_kbtu_sf_yr, 2)}`;
+      document.getElementById("mae-value").textContent = format(result.model_test_metrics.mae, 3);
+      document.getElementById("mse-value").textContent = format(result.model_test_metrics.mse, 3);
+      document.getElementById("rmse-value").textContent = format(result.model_test_metrics.rmse, 3);
+      document.getElementById("mape-value").textContent = `${format(result.model_test_metrics.mape * 100, 2)}%`;
+      document.getElementById("max-error-value").textContent = format(result.model_test_metrics.max_error, 3);
+      document.getElementById("r2-value").textContent = format(result.model_test_metrics.r2, 3);
+      if (result.warnings.length) {
+        setMessage(warningMessage, result.warnings.join(" | "), "warn");
+      } else {
+        setMessage(warningMessage, "Inputs are inside the training range.");
+      }
+    }
+
+    function writeDesign(design) {
+      Object.entries(design).forEach(([key, value]) => {
+        setParamValue(key, value);
+      });
+      renderDesignSummary(design);
+      drawBuilding(design);
+    }
+
+    function renderDesignSummary(design = readDesign()) {
+      const items = [
+        ["Wall R", format(design.wall_r, 2)],
+        ["Roof R", format(design.roof_r, 2)],
+        ["Window U", format(design.window_u, 3)],
+        ["WWR", format(design.wwr, 3)],
+        ["SHGC", format(design.shgc, 3)],
+        ["Lighting", format(design.lighting_density, 2)],
+        ["Infiltration", format(design.infiltration, 6)],
+        ["Orientation", `${format(design.orientation_deg, 0)}°`]
+      ];
+      designSummary.innerHTML = items.map(([label, value]) => `
+        <div class="design-item"><span>${label}</span><strong>${value}</strong></div>
+      `).join("");
+    }
+
+    function drawBuilding(design = readDesign()) {
+      const canvas = buildingCanvas;
+      const ctx = canvas.getContext("2d");
+      const rect = canvas.getBoundingClientRect();
+      const scale = window.devicePixelRatio || 1;
+      canvas.width = Math.round(rect.width * scale);
+      canvas.height = Math.round(rect.height * scale);
+      ctx.scale(scale, scale);
+
+      const w = rect.width;
+      const h = rect.height;
+      ctx.clearRect(0, 0, w, h);
+      const roofR = Math.min(Math.max(design.roof_r, parameterBounds.roof_r.min), parameterBounds.roof_r.max);
+      const wallR = Math.min(Math.max(design.wall_r, parameterBounds.wall_r.min), parameterBounds.wall_r.max);
+      const infiltration = Math.min(Math.max(design.infiltration, parameterBounds.infiltration.min), parameterBounds.infiltration.max);
+      const clampedWwr = Math.min(Math.max(design.wwr, parameterBounds.wwr.min), parameterBounds.wwr.max);
+      const lighting = Math.min(Math.max(design.lighting_density, parameterBounds.lighting_density.min), parameterBounds.lighting_density.max);
+      const orientation = ((design.orientation_deg % 360) + 360) % 360;
+
+      ctx.fillStyle = "#fffdf7";
+      ctx.fillRect(0, 0, w, h);
+
+      const unit = Math.min(w / 94, h / 66);
+      const origin = { x: w * 0.23, y: h * 0.82 };
+      function project(x, y, z) {
+        return {
+          x: origin.x + (x - y) * unit * 0.92,
+          y: origin.y - (x + y) * unit * 0.36 - z * unit * 1.16
+        };
+      }
+      function orientPoint(point) {
+        const theta = (orientation - 180) * Math.PI / 180;
+        const cx = bx + bl / 2;
+        const cy = by + bd / 2;
+        const dx = point[0] - cx;
+        const dy = point[1] - cy;
+        return [
+          cx + dx * Math.cos(theta) - dy * Math.sin(theta),
+          cy + dx * Math.sin(theta) + dy * Math.cos(theta),
+          point[2]
+        ];
+      }
+      function polygon(points, fill, stroke = "#283338", width = 1, alpha = 1, rotate = true) {
+        ctx.save();
+        ctx.globalAlpha = alpha;
+        ctx.beginPath();
+        points.forEach((point, index) => {
+          const rotated = rotate ? orientPoint(point) : point;
+          const p = project(rotated[0], rotated[1], rotated[2]);
+          if (index === 0) ctx.moveTo(p.x, p.y);
+          else ctx.lineTo(p.x, p.y);
+        });
+        ctx.closePath();
+        ctx.fillStyle = fill;
+        ctx.strokeStyle = stroke;
+        ctx.lineWidth = width;
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+      function line(a, b, color = "#c9c5bd", width = 1, rotate = true) {
+        const ar = rotate ? orientPoint(a) : a;
+        const br = rotate ? orientPoint(b) : b;
+        const p1 = project(ar[0], ar[1], ar[2]);
+        const p2 = project(br[0], br[1], br[2]);
+        ctx.beginPath();
+        ctx.moveTo(p1.x, p1.y);
+        ctx.lineTo(p2.x, p2.y);
+        ctx.strokeStyle = color;
+        ctx.lineWidth = width;
+        ctx.stroke();
+      }
+      function label(text, point, dx = 0, dy = 0, color = "#263138", rotate = true) {
+        const rotated = rotate ? orientPoint(point) : point;
+        const p = project(rotated[0], rotated[1], rotated[2]);
+        ctx.fillStyle = color;
+        ctx.font = "12px Inter, system-ui, sans-serif";
+        ctx.fillText(text, p.x + dx, p.y + dy);
+      }
+      function box(x, y, z, length, depth, height, fill, stroke = "#243038", alpha = 0.42, width = 1) {
+        const a = [x, y, z];
+        const b = [x + length, y, z];
+        const c = [x + length, y + depth, z];
+        const d = [x, y + depth, z];
+        const e = [x, y, z + height];
+        const f = [x + length, y, z + height];
+        const g = [x + length, y + depth, z + height];
+        const hh = [x, y + depth, z + height];
+        polygon([d, c, g, hh], fill, stroke, width, alpha * 0.72);
+        polygon([b, c, g, f], fill, stroke, width, alpha * 0.86);
+        polygon([a, b, f, e], fill, stroke, width, alpha);
+        polygon([e, f, g, hh], fill, stroke, width, alpha * 0.64);
+      }
+      function windowOnY(x0, y0, z0, width, height, alpha = 0.75) {
+        polygon([[x0, y0, z0], [x0 + width, y0, z0], [x0 + width, y0, z0 + height], [x0, y0, z0 + height]], windowColor, glazingStroke, frameWidth, alpha);
+      }
+      function windowOnX(x0, y0, z0, width, height, alpha = 0.65) {
+        polygon([[x0, y0, z0], [x0, y0 + width, z0], [x0, y0 + width, z0 + height], [x0, y0, z0 + height]], windowColor, glazingStroke, frameWidth * 0.82, alpha);
+      }
+
+      for (let x = 0; x <= 60; x += 10) {
+        line([x, -25, 0], [x, 30, 0], "#c9c5bd", 1, false);
+        const p = project(x, -28, 0);
+        ctx.fillStyle = "#5f6762";
+        ctx.font = "11px Inter, system-ui, sans-serif";
+        ctx.fillText(String(x), p.x - 4, p.y + 14);
+      }
+      for (let y = -20; y <= 30; y += 10) {
+        line([0, y, 0], [60, y, 0], "#c9c5bd", 1, false);
+        const p = project(62, y, 0);
+        ctx.fillStyle = "#5f6762";
+        ctx.font = "11px Inter, system-ui, sans-serif";
+        ctx.fillText(String(y), p.x + 3, p.y + 4);
+      }
+      for (let z = 0; z <= 12; z += 2) {
+        line([64, 30, z], [64, 30, z + 0.01], "#8d8d86", 1, false);
+        label(String(z), [65, 30, z], 12, 3, "#4c5350", false);
+      }
+      line([0, -25, 0], [64, -25, 0], "#1f2523", 1.6, false);
+      line([60, -25, 0], [60, 32, 0], "#1f2523", 1.6, false);
+      line([64, 30, 0], [64, 30, 14], "#1f2523", 1.6, false);
+      label("X (m)", [34, -32, 0], 0, 18, "#263138", false);
+      label("Y (m)", [64, 4, 0], 10, 8, "#263138", false);
+      label("Z (m)", [64, 30, 14], 18, -16, "#263138", false);
+
+      const wallAlpha = 0.28 + ((wallR - parameterBounds.wall_r.min) / (parameterBounds.wall_r.max - parameterBounds.wall_r.min)) * 0.22;
+      const roofColor = roofR > 55 ? "#2bbaa5" : roofR > 35 ? "#93d3ae" : "#faecb6";
+      const livingColor = "#9ed9e8";
+      const breezewayColor = "#f96635";
+      const shgcRatio = (Math.min(Math.max(design.shgc, parameterBounds.shgc.min), parameterBounds.shgc.max) - parameterBounds.shgc.min) / (parameterBounds.shgc.max - parameterBounds.shgc.min);
+      const windowColor = shgcRatio > 0.66 ? "#a65045" : shgcRatio > 0.33 ? "#3b74a0" : "#295da8";
+      const glazingStroke = shgcRatio > 0.66 ? "#612b27" : "#073f66";
+      const frameWidth = 0.7 + (parameterBounds.window_u.max - Math.min(Math.max(design.window_u, parameterBounds.window_u.min), parameterBounds.window_u.max)) * 4.0;
+      const lightAlpha = 0.08 + ((lighting - parameterBounds.lighting_density.min) / (parameterBounds.lighting_density.max - parameterBounds.lighting_density.min)) * 0.20;
+
+      const bx = 14;
+      const by = -9.92;
+      const bl = 36.54;
+      const bd = 19.84;
+      const livingH = 7.92;
+      const floorH = livingH / 3;
+      const roofH = 4.13;
+      const breezewayW = 2.81;
+      const breezewayX = bx + bl / 2 - breezewayW / 2;
+
+      box(bx, by, 0, bl, bd, livingH, livingColor, "#1c2d35", wallAlpha, 1.4);
+      box(bx + 0.25, by + 0.25, 0.08, bl - 0.5, bd - 0.5, livingH - 0.16, "#fff7aa", "#d1ab31", lightAlpha, 0.8);
+      polygon([[bx, by, 0], [bx, by + bd, 0], [bx, by + bd, livingH], [bx, by, livingH]], livingColor, "#1c2d35", 1.4, wallAlpha * 0.92);
+      polygon([[bx, by + bd, 0], [bx + bl, by + bd, 0], [bx + bl, by + bd, livingH], [bx, by + bd, livingH]], livingColor, "#1c2d35", 1.4, wallAlpha * 0.76);
+      box(breezewayX, by - 0.2, 0.04, breezewayW, bd + 0.4, livingH - 0.08, breezewayColor, "#663020", 0.33, 1.2);
+
+      for (let level = 1; level < 3; level += 1) {
+        line([bx, by, level * floorH], [bx + bl, by, level * floorH], "#1c2d35", 1);
+        line([bx + bl, by, level * floorH], [bx + bl, by + bd, level * floorH], "#1c2d35", 1);
+      }
+      line([breezewayX, by, 0], [breezewayX, by, livingH], "#1c2d35", 1);
+      line([breezewayX + breezewayW, by, 0], [breezewayX + breezewayW, by, livingH], "#1c2d35", 1);
+      line([breezewayX, by + bd, 0], [breezewayX, by + bd, livingH], "#1c2d35", 1);
+      line([breezewayX + breezewayW, by + bd, 0], [breezewayX + breezewayW, by + bd, livingH], "#1c2d35", 1);
+
+      const ridgeZ = livingH + roofH;
+      const roofAlpha = 0.34 + ((roofR - 17) / 30) * 0.16;
+      polygon([[bx, by - 0.45, livingH], [bx, by + bd / 2, ridgeZ], [bx + bl, by + bd / 2, ridgeZ], [bx + bl, by - 0.45, livingH]], roofColor, "#263138", 1.2, roofAlpha);
+      polygon([[bx, by + bd + 0.45, livingH], [bx, by + bd / 2, ridgeZ], [bx + bl, by + bd / 2, ridgeZ], [bx + bl, by + bd + 0.45, livingH]], roofColor, "#263138", 1.2, roofAlpha * 0.86);
+      polygon([[bx, by - 0.45, livingH], [bx, by + bd / 2, ridgeZ], [bx, by + bd + 0.45, livingH]], roofColor, "#263138", 1.2, roofAlpha + 0.08);
+      polygon([[bx + bl, by - 0.45, livingH], [bx + bl, by + bd / 2, ridgeZ], [bx + bl, by + bd + 0.45, livingH]], roofColor, "#263138", 1.0, roofAlpha * 0.72);
+      line([bx, by + bd / 2, ridgeZ], [bx + bl, by + bd / 2, ridgeZ], "#263138", 1.4);
+
+      const winW = 1.7 + clampedWwr * 4.2;
+      const winH = 0.85 + clampedWwr * 1.15;
+      const leftXs = [bx + 3.5, bx + 9.5, bx + 15.5];
+      const rightXs = [bx + 22.0, bx + 28.5];
+      const windowXs = [...leftXs, ...rightXs];
+      ctx.lineWidth = frameWidth;
+      for (let floor = 0; floor < 3; floor += 1) {
+        const z0 = 0.72 + floor * floorH;
+        windowXs.forEach((x0) => {
+          windowOnY(x0, by - 0.05, z0, winW, winH, 0.78);
+          windowOnY(x0, by + bd + 0.05, z0, winW, winH, 0.46);
+        });
+      }
+      for (let floor = 0; floor < 3; floor += 1) {
+        const z0 = 0.72 + floor * floorH;
+        [by + 3.2, by + 9.4, by + 15.6].forEach((y0) => {
+          windowOnX(bx + bl + 0.05, y0, z0, winW * 0.78, winH, 0.62);
+          windowOnX(bx - 0.05, y0, z0, winW * 0.78, winH, 0.52);
+        });
+      }
+
+      const leakCount = Math.round(2 + ((infiltration - parameterBounds.infiltration.min) / (parameterBounds.infiltration.max - parameterBounds.infiltration.min)) * 5);
+      for (let i = 0; i < leakCount; i += 1) {
+        const z = 1.2 + (i % 5) * 1.35;
+        const y = by - 5 - Math.floor(i / 5) * 3;
+        line([bx - 4 - i * 0.18, y, z], [bx - 0.8, by - 0.4, z + 0.18], "#f96635", 1.5 + leakCount * 0.16);
+      }
+      label(`air leakage: ${leakCount}`, [bx - 6.2, by - 7.5, 2.1], -38, 0, "#9a5b16");
+
+      label("3 conditioned floors", [bx + bl * 0.18, by - 4.6, livingH * 0.22], -6, 8);
+      label("attic / roof volume", [bx + bl * 0.52, by + bd * 0.52, ridgeZ], 8, -18);
+      label("breezeway", [breezewayX, by + bd + 2.6, livingH * 0.34], -12, 12);
+      label("36.54 m ridge", [bx + bl * 0.62, by + bd * 0.5, ridgeZ], 8, -34);
+      label("19.84 m span", [bx + bl + 2.2, by + bd * 0.34, 0], 12, 18);
+      label("12.05 m", [bx + bl + 4.2, by + bd + 1.5, ridgeZ], 14, -10);
+
+      ctx.fillStyle = "#1f2523";
+      ctx.font = "13px Inter, system-ui, sans-serif";
+      ctx.fillText("Current design inputs", 18, 18);
+      ctx.fillText(`WWR ${format(design.wwr, 2)} | Window U ${format(design.window_u, 2)} | SHGC ${format(design.shgc, 2)}`, 18, 40);
+      ctx.fillText(`Wall R ${format(design.wall_r, 1)} | Roof R ${format(design.roof_r, 1)} | Infiltration ${format(design.infiltration, 6)}`, 18, 60);
+      ctx.fillText(`Lighting ${format(design.lighting_density, 2)} W/m2 | Orientation ${format(orientation, 0)}°`, 18, 80);
+
+      const compassX = w - 112;
+      const compassY = 72;
+      const compassR = 32;
+      ctx.save();
+      ctx.strokeStyle = "#263138";
+      ctx.fillStyle = "#263138";
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.arc(compassX, compassY, compassR, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.font = "12px Inter, system-ui, sans-serif";
+      ctx.fillText("N", compassX - 4, compassY - compassR - 8);
+      const angle = (orientation - 90) * Math.PI / 180;
+      ctx.beginPath();
+      ctx.moveTo(compassX, compassY);
+      ctx.lineTo(compassX + Math.cos(angle) * (compassR - 5), compassY + Math.sin(angle) * (compassR - 5));
+      ctx.strokeStyle = "#f96635";
+      ctx.lineWidth = 3;
+      ctx.stroke();
+      ctx.fillText(`${format(orientation, 0)}°`, compassX - 16, compassY + compassR + 18);
+      ctx.restore();
+    }
+
+    const apiBaseFromQuery = new URLSearchParams(window.location.search).get("api");
+    if (apiBaseFromQuery) {
+      window.localStorage.setItem("EUI_API_BASE_URL", apiBaseFromQuery);
+    }
+    const API_BASE_URL = (
+      window.EUI_API_BASE_URL ||
+      window.localStorage.getItem("EUI_API_BASE_URL") ||
+      ""
+    ).replace(/\/$/, "");
+
+    function apiUrl(path) {
+      if (/^https?:\/\//i.test(path)) return path;
+      return `${API_BASE_URL}${path}`;
+    }
+
+    async function getJson(url, options = {}) {
+      const response = await fetch(apiUrl(url), {
+        headers: { "Content-Type": "application/json" },
+        ...options
+      });
+      if (!response.ok) {
+        const text = await response.text();
+        let message = text || response.statusText;
+        try {
+          const data = JSON.parse(text);
+          message = data.detail || message;
+        } catch (_) {
+          // Keep the raw response text.
+        }
+        throw new Error(message);
+      }
+      return response.json();
+    }
+
+    async function refreshHealth() {
+      try {
+        const health = await getJson("/health");
+        statusEl.textContent = `${health.model_type} model | ${health.n_samples} samples`;
+      } catch (error) {
+        statusEl.textContent = "API/model unavailable";
+        statusEl.title = error.message;
+      }
+    }
+
+    async function predict() {
+      setBusy(true);
+      setMessage(inputMessage, "Predicting...");
+      try {
+        drawBuilding();
+        const result = await getJson("/predict", {
+          method: "POST",
+          body: JSON.stringify(readDesign())
+        });
+        updatePredictionDisplay(result);
+        setMessage(inputMessage, "Prediction complete.");
+      } catch (error) {
+        setMessage(inputMessage, error.message, "bad");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function suggest() {
+      setBusy(true);
+      setMessage(inputMessage, "Searching candidates...");
+      try {
+        const result = await getJson("/suggest", {
+          method: "POST",
+            body: JSON.stringify({
+              design: readDesign(),
+              n_candidates: 2000,
+              top_k: 5,
+              fixed_parameters: readFixedParameters()
+            })
+          });
+        document.getElementById("eui-value").textContent = format(result.current_predicted_eui_kbtu_sf_yr, 2);
+        suggestionBaseDesign = readDesign();
+        suggestionBaseEui = result.current_predicted_eui_kbtu_sf_yr;
+        lastSuggestions = result.suggestions;
+        suggestionsBody.innerHTML = "";
+        if (!result.suggestions.length) {
+          suggestionsBody.innerHTML = '<tr><td colspan="13" style="text-align:left;color:var(--muted);">No candidates found.</td></tr>';
+        } else {
+          result.suggestions.forEach((item, index) => {
+            const row = document.createElement("tr");
+            row.innerHTML = `
+              <td>
+                <button type="button" class="mini-button" data-action="accept" data-index="${index}">Accept</button>
+                <button type="button" class="mini-button reject" data-action="reject" data-index="${index}">Reject</button>
+              </td>
+              <td>Option ${index + 1}</td>
+              <td>${format(item.predicted_eui_kbtu_sf_yr, 2)}</td>
+              <td>${item.p_eui_reduction === null || item.p_eui_reduction === undefined ? "--" : `${format(item.p_eui_reduction * 100, 1)}%`}</td>
+              <td class="improve">${format(item.improvement_kbtu_sf_yr, 2)}</td>
+              <td>${format(item.wall_r, 2)}</td>
+              <td>${format(item.roof_r, 2)}</td>
+              <td>${format(item.window_u, 3)}</td>
+              <td>${format(item.wwr, 3)}</td>
+              <td>${format(item.shgc, 3)}</td>
+              <td>${format(item.lighting_density, 2)}</td>
+              <td>${format(item.infiltration, 6)}</td>
+              <td>${format(item.orientation_deg, 0)}°</td>
+            `;
+            suggestionsBody.appendChild(row);
+          });
+        }
+        const fixed = result.fixed_parameters && result.fixed_parameters.length ? ` Fixed: ${result.fixed_parameters.join(", ")}.` : "";
+        setMessage(inputMessage, `Suggestions ready.${fixed}`);
+      } catch (error) {
+        setMessage(inputMessage, error.message, "bad");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    async function acceptSuggestion(index) {
+      const item = lastSuggestions[index];
+      if (!item || !suggestionBaseDesign) return;
+      const previousDesign = { ...suggestionBaseDesign };
+      const previousEui = suggestionBaseEui;
+      const acceptedDesign = suggestionToDesign(item);
+      writeDesign(acceptedDesign);
+      setBusy(true);
+      setMessage(inputMessage, "Accepting suggestion...");
+      try {
+        const result = await getJson("/predict", {
+          method: "POST",
+          body: JSON.stringify(acceptedDesign)
+        });
+        updatePredictionDisplay(result);
+        renderComparison(previousDesign, previousEui, acceptedDesign, result.predicted_eui_kbtu_sf_yr);
+        setMessage(inputMessage, "Suggestion accepted.");
+      } catch (error) {
+        setMessage(inputMessage, error.message, "bad");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    function rejectSuggestion(index, button) {
+      const row = button.closest("tr");
+      if (row) row.classList.add("rejected");
+      setMessage(inputMessage, `Option ${index + 1} rejected.`);
+    }
+
+    async function runAgent() {
+      setBusy(true);
+      setMessage(inputMessage, "Asking Claude agent...");
+      setMessage(agentResponse, "Thinking...");
+      try {
+        const result = await getJson("/agent", {
+          method: "POST",
+          body: JSON.stringify({ description: agentDescription.value })
+        });
+        writeDesign(result.design);
+        updatePredictionDisplay(result.prediction);
+        setMessage(agentResponse, result.response);
+        setMessage(inputMessage, "Agent response ready.");
+      } catch (error) {
+        setMessage(inputMessage, error.message, "bad");
+        setMessage(agentResponse, "Agent request failed.", "bad");
+      } finally {
+        setBusy(false);
+      }
+    }
+
+    form.addEventListener("submit", (event) => {
+      event.preventDefault();
+      syncAllControls();
+      predict();
+    });
+    suggestButton.addEventListener("click", suggest);
+    agentButton.addEventListener("click", runAgent);
+    examplePromptButtons.forEach((button) => {
+      button.addEventListener("click", () => {
+        agentDescription.value = button.dataset.prompt;
+        agentDescription.focus();
+      });
+    });
+    suggestionsBody.addEventListener("click", (event) => {
+      const button = event.target.closest("button[data-action]");
+      if (!button) return;
+      const index = Number(button.dataset.index);
+      if (button.dataset.action === "accept") {
+        acceptSuggestion(index);
+      } else {
+        rejectSuggestion(index, button);
+      }
+    });
+    Object.keys(parameterBounds).forEach((name) => {
+      const numberInput = document.getElementById(name);
+      const rangeInput = document.getElementById(`${name}_range`);
+      rangeInput.addEventListener("input", () => {
+        setParamValue(name, rangeInput.value);
+        renderDesignSummary();
+        drawBuilding();
+      });
+      numberInput.addEventListener("change", () => {
+        setParamValue(name, numberInput.value);
+        renderDesignSummary();
+        drawBuilding();
+      });
+      numberInput.addEventListener("input", () => {
+        const numeric = Number(numberInput.value);
+        if (!Number.isNaN(numeric)) {
+          rangeInput.value = clampParam(name, numeric);
+          renderDesignSummary();
+          drawBuilding();
+        }
+      });
+    });
+    form.addEventListener("input", (event) => {
+      if (event.target.type === "range" || event.target.type === "number") return;
+      renderDesignSummary();
+      drawBuilding();
+    });
+    window.addEventListener("resize", () => drawBuilding());
+    syncAllControls();
+    renderDesignSummary();
+    drawBuilding();
+    refreshHealth();
+  </script>
+</body>
+</html>
