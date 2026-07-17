@@ -137,6 +137,22 @@ app.add_middleware(
 artifact = None
 
 
+def get_anthropic_api_key() -> str:
+    raw_key = os.getenv("ANTHROPIC_API_KEY", "")
+    api_key = "".join(raw_key.strip().strip('"').strip("'").split())
+    if not api_key:
+        raise HTTPException(
+            status_code=503,
+            detail="ANTHROPIC_API_KEY is not set. Set it in the API server environment variables.",
+        )
+    if not api_key.startswith("sk-ant-"):
+        raise HTTPException(
+            status_code=503,
+            detail="ANTHROPIC_API_KEY appears to be invalid. It should start with sk-ant-.",
+        )
+    return api_key
+
+
 def load_artifact():
     global artifact
     if artifact is None:
@@ -297,12 +313,7 @@ def call_claude(prompt: str, max_tokens: int = 1200) -> str:
             detail="httpx is not installed in this Python environment. Install it to use the Claude agent.",
         )
 
-    api_key = os.getenv("ANTHROPIC_API_KEY")
-    if not api_key:
-        raise HTTPException(
-            status_code=503,
-            detail="ANTHROPIC_API_KEY is not set. Set it before starting the API server.",
-        )
+    api_key = get_anthropic_api_key()
 
     headers = {
         "x-api-key": api_key,
@@ -320,15 +331,21 @@ def call_claude(prompt: str, max_tokens: int = 1200) -> str:
             response.raise_for_status()
             data = response.json()
     except httpx.HTTPStatusError as exc:
+        response_text = exc.response.text
+        if exc.response.status_code in {401, 403}:
+            response_text = "Authentication failed. Check the ANTHROPIC_API_KEY environment variable."
         raise HTTPException(
             status_code=502,
             detail=(
                 f"Anthropic API request failed with status {exc.response.status_code}: "
-                f"{exc.response.text}"
+                f"{response_text}"
             ),
         ) from exc
     except httpx.HTTPError as exc:
-        raise HTTPException(status_code=502, detail=f"Anthropic API request failed: {exc}") from exc
+        raise HTTPException(
+            status_code=502,
+            detail="Anthropic API request failed before a response was returned. Check the API key formatting and server logs.",
+        ) from exc
 
     return data["content"][0]["text"]
 
