@@ -7,9 +7,9 @@ parameter extraction.
 
 ## Production
 
-- Website: https://frontend-three-sigma-d9j1jnbhb4.vercel.app
-- Health check: https://frontend-three-sigma-d9j1jnbhb4.vercel.app/api/health
-- API documentation: https://frontend-three-sigma-d9j1jnbhb4.vercel.app/api/docs
+- Website: https://eui-predictor.vercel.app
+- Health check: https://eui-predictor.vercel.app/api/health
+- API documentation: https://eui-predictor.vercel.app/api/docs
 
 The production frontend and FastAPI backend both run on Vercel. ANN inference uses the
 NumPy artifact in `frontend/eui_model_numpy.npz`, exported from the selected PyTorch model.

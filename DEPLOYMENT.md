@@ -17,6 +17,7 @@ original PyTorch artifact before deployment.
 ### Vercel project settings
 
 - Git repository: `cosmicpoii/EUI_prediction`
+- Vercel project: `eui-predictor`
 - Root Directory: `frontend`
 - Framework: FastAPI (configured by `frontend/vercel.json`)
 - Production branch: `main`
@@ -56,6 +57,8 @@ https://your-site.vercel.app/
 https://your-site.vercel.app/api/health
 https://your-site.vercel.app/api/docs
 ```
+
+Current production URL: `https://eui-predictor.vercel.app`
 
 The frontend detects a `*.vercel.app` host and uses `/api` automatically. `?api=...`
 remains available as an explicit API override for local testing or recovery.
