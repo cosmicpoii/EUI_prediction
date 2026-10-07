@@ -10,7 +10,7 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY eui_api.py .
 COPY frontend ./frontend
-COPY models_torch_range2_physics_1 ./models_torch_range2_physics_1
+COPY models_torch_range2_physics_01 ./models_torch_range2_physics_01
 
 EXPOSE 8000
 

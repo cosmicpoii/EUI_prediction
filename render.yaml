@@ -7,9 +7,9 @@ services:
     startCommand: uvicorn eui_api:app --host 0.0.0.0 --port $PORT
     envVars:
       - key: EUI_MODEL_PATH
-        value: models_torch_range2_physics_1/eui_ann_torch_model.pt
+        value: models_torch_range2_physics_01/eui_ann_torch_model.pt
       - key: EUI_SCALER_PATH
-        value: models_torch_range2_physics_1/eui_ann_torch_scalers.joblib
+        value: models_torch_range2_physics_01/eui_ann_torch_scalers.joblib
       - key: EUI_CORS_ORIGINS
         value: "*"
       - key: ANTHROPIC_API_KEY

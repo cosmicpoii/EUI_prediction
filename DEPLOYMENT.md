@@ -16,8 +16,8 @@ Render 通常从 GitHub repo 部署。确认 repo 里至少包含：
 
 - `eui_api.py`
 - `frontend/index.html`
-- `models_torch_range2_physics_1/eui_ann_torch_model.pt`
-- `models_torch_range2_physics_1/eui_ann_torch_scalers.joblib`
+- `models_torch_range2_physics_01/eui_ann_torch_model.pt`
+- `models_torch_range2_physics_01/eui_ann_torch_scalers.joblib`
 - `requirements.txt`
 - `render.yaml`
 
@@ -46,13 +46,15 @@ Start command: uvicorn eui_api:app --host 0.0.0.0 --port $PORT
 Render service 的 Environment Variables 里设置：
 
 ```text
-EUI_MODEL_PATH=models_torch_range2_physics_1/eui_ann_torch_model.pt
-EUI_SCALER_PATH=models_torch_range2_physics_1/eui_ann_torch_scalers.joblib
+EUI_MODEL_PATH=models_torch_range2_physics_01/eui_ann_torch_model.pt
+EUI_SCALER_PATH=models_torch_range2_physics_01/eui_ann_torch_scalers.joblib
 EUI_CORS_ORIGINS=*
 ANTHROPIC_API_KEY=your_anthropic_key_here
 ```
 
 `ANTHROPIC_API_KEY` 只影响 AI Agent 自然语言解析。如果不设置，手动参数预测和 Find Lower EUI 仍然可以工作，但 Claude agent 功能会报 key missing。
+
+部署包暂时保留了旧的 `models_torch_range2_physics_1` 路径作为兼容副本；其中的模型文件已经替换为最终的 `lambda=0.1` 模型。建议 Render 环境变量仍更新为上面的 `models_torch_range2_physics_01` 路径。
 
 ### 4. 访问网站
 
@@ -115,11 +117,14 @@ Vercel 项目建议把 Project Root 设置为：
 frontend
 ```
 
-`frontend/vercel.json` 已经包含静态页面 rewrite 设置。部署后同样用：
+`frontend/vercel.json` 已经包含静态页面 rewrite 设置。前端默认连接下面的 Render 后端：
 
 ```text
-https://your-vercel-site.vercel.app/?api=https://apartment-eui-predictor.onrender.com
+https://apartment-eui-predictor.onrender.com
 ```
+
+因此部署后的 Vercel URL 可以直接打开。若后端域名发生变化，仍可用
+`?api=https://your-new-backend.example.com` 覆盖并保存新的 API 地址。
 
 ### 4. 收紧 CORS
 
@@ -179,4 +184,3 @@ https://your-backend-url/health
 ### 手动 Predict 可以用，但 Agent 不行
 
 这是正常的分离设计。手动预测只需要 ANN 模型；Agent 需要 Claude API key。
-

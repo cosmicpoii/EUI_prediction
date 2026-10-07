@@ -1234,10 +1234,13 @@
     if (apiBaseFromQuery) {
       window.localStorage.setItem("EUI_API_BASE_URL", apiBaseFromQuery);
     }
+    const DEPLOYED_API_BASE_URL = "https://apartment-eui-predictor.onrender.com";
+    const usesSameOriginApi = ["localhost", "127.0.0.1", "apartment-eui-predictor.onrender.com"]
+      .includes(window.location.hostname);
     const API_BASE_URL = (
       window.EUI_API_BASE_URL ||
       window.localStorage.getItem("EUI_API_BASE_URL") ||
-      ""
+      (usesSameOriginApi ? "" : DEPLOYED_API_BASE_URL)
     ).replace(/\/$/, "");
 
     function apiUrl(path) {

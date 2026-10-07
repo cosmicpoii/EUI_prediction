@@ -19,8 +19,8 @@ except ImportError:
 
 # MODEL_PATH = os.getenv("EUI_MODEL_PATH", "models_sklearn_wwr_split/eui_ann_model.joblib")
 # SCALER_PATH = os.getenv("EUI_SCALER_PATH", "models_torch/eui_ann_torch_scalers.joblib")
-MODEL_PATH = os.getenv("EUI_MODEL_PATH", "models_torch_range2_physics_1/eui_ann_torch_model.pt")
-SCALER_PATH = os.getenv("EUI_SCALER_PATH", "models_torch_range2_physics_1/eui_ann_torch_scalers.joblib")
+MODEL_PATH = os.getenv("EUI_MODEL_PATH", "models_torch_range2_physics_01/eui_ann_torch_model.pt")
+SCALER_PATH = os.getenv("EUI_SCALER_PATH", "models_torch_range2_physics_01/eui_ann_torch_scalers.joblib")
 ANTHROPIC_URL = "https://api.anthropic.com/v1/messages"
 ANTHROPIC_MODEL = os.getenv("ANTHROPIC_MODEL", "claude-sonnet-4-6")
 
@@ -393,6 +393,10 @@ Use these training bounds:
 Interpret common language like "large windows", "well insulated", "leaky", or "low air leakage"
 as values inside these bounds. Interpret compass orientation as degrees clockwise from north.
 If the user description is vague, choose conservative midpoint values.
+If the user explicitly provides a numerical value, copy that numerical value exactly into the JSON.
+Do not clamp, replace, correct, or move explicit user-provided numerical values into the training range.
+The prediction backend will validate ranges and return warnings for out-of-range values.
+For qualitative or unspecified design requests only, infer values inside the training bounds.
 Do not include comments or markdown.
 
 User description:
