@@ -1234,13 +1234,17 @@
     if (apiBaseFromQuery) {
       window.localStorage.setItem("EUI_API_BASE_URL", apiBaseFromQuery);
     }
-    const DEPLOYED_API_BASE_URL = "https://apartment-eui-predictor.onrender.com";
+    const RENDER_FALLBACK_API_URL = "https://apartment-eui-predictor.onrender.com";
+    const isVercelDeployment = window.location.hostname.endsWith(".vercel.app");
     const usesSameOriginApi = ["localhost", "127.0.0.1", "apartment-eui-predictor.onrender.com"]
       .includes(window.location.hostname);
+    const defaultApiBaseUrl = isVercelDeployment
+      ? "/api"
+      : (usesSameOriginApi ? "" : RENDER_FALLBACK_API_URL);
     const API_BASE_URL = (
       window.EUI_API_BASE_URL ||
       window.localStorage.getItem("EUI_API_BASE_URL") ||
-      (usesSameOriginApi ? "" : DEPLOYED_API_BASE_URL)
+      defaultApiBaseUrl
     ).replace(/\/$/, "");
 
     function apiUrl(path) {

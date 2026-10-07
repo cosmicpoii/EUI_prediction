@@ -1,6 +1,14 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "public": true,
+  "framework": "fastapi",
+  "functions": {
+    "app.py": {
+      "maxDuration": 60,
+      "includeFiles": "eui_model_numpy.npz"
+    }
+  },
   "rewrites": [
-    { "source": "/(.*)", "destination": "/index.html" }
+    { "source": "/", "destination": "/index.html" }
   ]
 }
